@@ -1,0 +1,67 @@
+clc;
+clear;
+close all;
+%image = imread('img/2.jpg');
+%image = imread('AmostrasDigitais/db4a2004/1_5.tif');
+image =  imread('AmostrasDigitais/db2a2000/1_1.tif');
+[nRow nCol nChannels] = size(image);
+
+if(nChannels > 1)
+    image=rgb2gray(image);
+end
+figure()
+imshow(image);
+
+zeroPadding = 1;
+blockSize = 16;
+currentRow = 1;
+currentCol = 1;
+numberBlocks = 0;
+imageFiltred2 = image;
+
+for i=1:10
+cells = createCells(image,nRow,nCol, blockSize,zeroPadding);
+[cellRow cellCol] = size(cells);
+overlapCells = createOverlapCells(image, blockSize,cells,cellRow,cellCol);
+overlapCells = computeBlockQuality(overlapCells,cellRow,cellCol);
+overlapCells = spectralFiltering(overlapCells);
+overlapCells2 = returnToSpatialDomain(overlapCells);
+cells2 = unOverlapBlocks(overlapCells2, blockSize,1);
+imageFiltred = blocks2Image(cells2, nRow, nCol);
+%figure()
+%imshow(imageFiltred)
+%image = imageFiltred;
+sumImage{i} = imageFiltred;
+%if(i > 1)
+%    imageFiltred2 = imageFiltred2 + imageFiltred;
+%else
+%    imageFiltred2 = imageFiltred;
+%end
+%image = imageFiltred2;
+%imageFiltred2 = imageFiltred;
+%figure()
+%imshow(imageFiltred2)
+end
+
+a = sumImage{1};
+
+
+    for i=1:9
+        diff(i) = sumImage{1} - sumImage{(i+1)};
+    end
+    
+%     for row=1:size(diff,1)
+%         for col=1:size(diff,2)
+%             if(diff(row,col) > 127 )
+%                 a(row,col) = 0;
+%             end
+%         end
+%     end
+
+% figure()
+% imshow(a);
+figure()
+imshow(imageFiltred)
+
+
+
